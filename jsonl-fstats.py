@@ -42,8 +42,8 @@ def traverse(obj,path):
                 valstats[path][obj]={}
                 valstats[path][obj]=1
         if path not in stats:
-            stats[path]=1
-        else:
+            stats[path]=0
+        if path in stats:
             stats[path]+=1
         
 if __name__ == "__main__":
@@ -55,7 +55,7 @@ if __name__ == "__main__":
     parser.add_argument('-headless',action="store_true",help='don\'t print head')
     parser.add_argument('-delimiter',type=str,help='delimiter to use')
     args=parser.parse_args()
-    hitcount=1
+    hitcount=0
     if args.help:
         print("jsonl-fstats\n"\
 "        -help      print this help\n"\
