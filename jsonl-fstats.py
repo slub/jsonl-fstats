@@ -51,10 +51,20 @@ if __name__ == "__main__":
     parser.add_argument('-finc',action="store_true",help='Avoid >100% on analyzing finc data')
     parser.add_argument('-marc',action="store_true",help='Ignore Marc Indicator')
     parser.add_argument('-dc',action="store_true",help='Analyze dublin core data')
+    parser.add_argument('-help',action="store_true",help='print more help')
     parser.add_argument('-headless',action="store_true",help='don\'t print head')
     parser.add_argument('-delimiter',type=str,help='delimiter to use')
     args=parser.parse_args()
     hitcount=1
+    if args.help:
+        print("jsonl-fstats\n"\
+"        -help      print this help\n"\
+"        -marc      ignore Marc identifier field if you are analysing an index of marc records\n"\
+"        -finc      Avoid >100% on analyzing finc/dc data when multiple fields are assigned to one key\n"\
+"        -dc        Analyze dublin core data\n"\
+"        -headless  don't print headline\n"\
+"        -delimiter set which delimiter to use\n")
+        exit()
     if args.headless:
         printhead=False
     if args.delimiter is None:
