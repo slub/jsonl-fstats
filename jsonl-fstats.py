@@ -12,7 +12,7 @@ stats = dict()
 valstats=dict()
 
 printhead=True
-def traverse(dict_or_list, path=[]):
+def traverse(dict_or_list, path):
     if isinstance(dict_or_list, dict):
         iterator = dict_or_list.items()
     elif isinstance(dict_or_list,list):
@@ -64,6 +64,15 @@ def getnotexisting(value, hitcount):
     else:
         return notexisting
 
+def marcString(string):
+    stringarr=string.split("###")
+    if(len(stringarr)==1) or '_' in stringarr[-1]:
+        return ""
+    string=stringarr[0]+" "+stringarr[-1]
+    return string
+        
+    
+
 
 if __name__ == "__main__":
     parser=argparse.ArgumentParser(description='return field statistics of an line-delimited JSON Document or Input-Stream')
@@ -77,7 +86,6 @@ if __name__ == "__main__":
         print("jsonl-fstats\n"\
 "        -help      print this help\n"\
 "        -marc      ignore Marc identifier field if you are analysing an index of marc records\n"\
-"        -finc      Avoid >100% on analyzing finc/dc data when multiple fields are assigned to one key\n"\
 "        -headless  don't print headline\n"\
 "        -delimiter set which delimiter to use\n")
         exit()
@@ -98,19 +106,22 @@ if __name__ == "__main__":
         for key,val in traverse(jline,""):
             path=""
             fields=key.replace("'","").split("][")
-            lenfield=len(fields)
-            for field in key.replace("'","").split("]["):
+            lastfield=removebraces(fields[-1])
+            for field in fields:
                 field=removebraces(field)
-                if args.marc==False:
-                    if isint(field):
-                        continue
-                path= path+" > " +field
-            path=path[2:]
+                if path:
+                    if args.marc==False:
+                        if isint(field):
+                            continue
+                        path=path+" > " +field
+                    elif args.marc==True:
+                        path=path+"###"+field
+                else:
+                    path=field
             if args.marc==True:
-                if len(path)>3:
-                    if path[0]!='_':
-                        marcpath=path[:3]+" "+path[-1:]
-                        path = marcpath
+                path=marcString(path)
+                if not path:
+                    continue
             if path not in valstats:
                 valstats[path]=dict()
             if path in valstats:
