@@ -122,6 +122,10 @@ if __name__ == "__main__":
                 path=marcString(path)
                 if not path:
                     continue
+                if path[-2]!=' ':
+                    continue
+                if path[-1]!='0' and isint(path[-1]) and int(path[0:3])>10:
+                    continue
             if path not in valstats:
                 valstats[path]=dict()
             if path in valstats:
