@@ -104,6 +104,8 @@ if __name__ == "__main__":
             print(line)
             continue
         for key,val in traverse(jline,""):
+            if isinstance(val,list):
+                continue
             path=""
             fields=key.replace("'","").split("][")
             lastfield=removebraces(fields[-1])
