@@ -7,11 +7,6 @@ import sys
 
 import numpy as np
 
-stats = dict()
-valstats = dict()
-
-printhead = True
-
 
 def traverse(dict_or_list, path):
     if isinstance(dict_or_list, dict):
@@ -95,6 +90,9 @@ def run():
               "        -headless  don't print headline\n" \
               "        -delimiter set which delimiter to use\n")
         exit()
+    stats = dict()
+    valstats = dict()
+    printhead = True
     if args.headless:
         printhead = False
     if args.delimiter is None:
