@@ -180,3 +180,6 @@ def run():
                 '"' + key + '"'))
         except TypeError:
             print("")
+
+if __name__ == "__main__":
+    run()
