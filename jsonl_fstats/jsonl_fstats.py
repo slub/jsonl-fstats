@@ -4,9 +4,7 @@ import argparse
 import collections
 import json
 import sys
-
 import numpy as np
-
 
 def traverse(dict_or_list, path):
     if isinstance(dict_or_list, dict):
@@ -19,20 +17,17 @@ def traverse(dict_or_list, path):
             for k, v in traverse(v, path + str([k])):
                 yield k, v
 
-
 def str_max_map_len(array):
     try:
         return str(max(map(len, array)))
     except TypeError:
         return ""
 
-
 def str_min_map_len(array):
     try:
         return str(min(map(len, array)))
     except TypeError:
         return ""
-
 
 def removebraces(string):
     if string[-1] == ']':
@@ -41,14 +36,12 @@ def removebraces(string):
         string = string[1:]
     return string
 
-
 def isint(num):
     try:
         int(num)
         return True
     except ValueError:
         return False
-
 
 def getpercent(value, hitcount):
     percent = (value) / float(hitcount) * 100
@@ -57,14 +50,12 @@ def getpercent(value, hitcount):
     else:
         return percent
 
-
 def getnotexisting(value, hitcount):
     notexisting = hitcount - value
     if notexisting < 0:
         return 0
     else:
         return notexisting
-
 
 def marcString(string):
     stringarr = string.split("###")
@@ -73,16 +64,14 @@ def marcString(string):
     string = stringarr[0] + " " + stringarr[-1]
     return string
 
-
 def run():
     parser = argparse.ArgumentParser(
         description='return field statistics of an line-delimited JSON Document or Input-Stream')
     parser.add_argument('-marc', action="store_true", help='Ignore Marc Indicator')
     parser.add_argument('-help', action="store_true", help='print more help')
     parser.add_argument('-headless', action="store_true", help='don\'t print head')
-    parser.add_argument('-delimiter', type=str, help='delimiter to use')
+    parser.add_argument('-delimiter',default="|",type=str, help='delimiter to use')
     args = parser.parse_args()
-    hitcount = 0
     if args.help:
         print("jsonl-fstats\n" \
               "        -help      print this help\n" \
@@ -90,15 +79,10 @@ def run():
               "        -headless  don't print headline\n" \
               "        -delimiter set which delimiter to use\n")
         exit()
-    stats = dict()
-    valstats = dict()
-    printhead = True
-    if args.headless:
-        printhead = False
-    if args.delimiter is None:
-        delim = '|'
-    else:
-        delim = str(args.delimiter)
+    hitcount = 0
+    stats = {}
+    valstats = {}
+    
     for line in sys.stdin:
         try:
             jline = json.loads(line)
@@ -132,25 +116,25 @@ def run():
                     continue
                 if path[-1] != '0' and isint(path[-1]) and int(path[0:3]) > 10:
                     continue
-            if path not in valstats:
-                valstats[path] = dict()
             if path in valstats:
                 if str(val) in valstats[path]:
                     valstats[path][str(val)] += 1
                 else:
                     valstats[path][str(val)] = {}
                     valstats[path][str(val)] = 1
-            if path not in stats:
-                stats[path] = 0
+            else:
+                valstats[path] = {}
             if path in stats:
                 stats[path] += 1
-    if printhead:
+            else:
+                stats[path] = 0 
+    if args.headless:
         print("Total Records: " + str(hitcount))
         print(
             "{:9s}{:1s}{:3s}{:1s}{:14s}{:1s}{:7s}{:1s}{:10s}{:1s}{:16s}{:1s}{:10s}{:1s}{:10s}{:1s}{:9s}{:1s}{:17s}{:1s}{:17s}{:1s}{:7s}{:1s}{:7s}{:1s}{:42s}".format(
-                "existing", delim, "%", delim, "notexisting", delim, "unique", delim, "avg", delim, "var", delim, "std",
-                delim, "max", delim, "min", delim, "max-value", delim, "min-value", delim, "max-len", delim, "min-len",
-                delim, "field name"))
+                "existing", args.delimiter, "%", args.delimiter, "notexisting", args.delimiter, "unique", args.delimiter, "avg", args.delimiter, "var", args.delimiter, "std",
+                args.delimiter, "max", args.delimiter, "min", args.delimiter, "max-value", args.delimiter, "min-value", args.delimiter, "max-len", args.delimiter, "min-len",
+                args.delimiter, "field name"))
     sortedstats = collections.OrderedDict(sorted(stats.items()))
     for key, value in sortedstats.items():
         if key in valstats:
@@ -162,19 +146,19 @@ def run():
         try:
             print(
             "{:>9d}{:1s}{:>3.0f}{:1s}{:>14d}{:1s}{:>7d}{:1s}{:>10.2f}{:1s}{:>16.2f}{:1s}{:>10.2f}{:1s}{:>10d}{:1s}{:>9d}{:1s}{:>17s}{:1s}{:>17s}{:1s}{:>7s}{:1s}{:>7s}{:1s}{:<42s}".format(
-                value, delim,
-                getpercent(value, hitcount), delim,
-                getnotexisting(value, hitcount), delim,
-                unique, delim,
-                np.mean(npdata), delim,
-                np.var(npdata), delim,
-                np.std(npdata), delim,
-                max(data), delim,
-                min(data), delim,
-                '"' + str(max(valstats[key], key=lambda x: valstats[key][x]))[0:15] + '"', delim,
-                '"' + str(min(valstats[key], key=lambda x: valstats[key][x]))[0:15] + '"', delim,
-                str_max_map_len(valstats[key]), delim,
-                str_max_map_len(valstats[key]), delim,
+                value, args.delimiter,
+                getpercent(value, hitcount), args.delimiter,
+                getnotexisting(value, hitcount), args.delimiter,
+                unique, args.delimiter,
+                np.mean(npdata), args.delimiter,
+                np.var(npdata), args.delimiter,
+                np.std(npdata), args.delimiter,
+                max(data), args.delimiter,
+                min(data), args.delimiter,
+                '"' + str(max(valstats[key], key=lambda x: valstats[key][x]))[0:15] + '"', args.delimiter,
+                '"' + str(min(valstats[key], key=lambda x: valstats[key][x]))[0:15] + '"', args.delimiter,
+                str_max_map_len(valstats[key]), args.delimiter,
+                str_max_map_len(valstats[key]), args.delimiter,
                 '"' + key + '"'))
         except TypeError:
             print("")
