@@ -161,7 +161,8 @@ if __name__ == "__main__":
             for obj in valstats[key]:
                 data.append(valstats[key][obj])
         npdata = np.asarray(data)
-        print(
+        try:
+            print(
             "{:>9d}{:1s}{:>3.0f}{:1s}{:>14d}{:1s}{:>7d}{:1s}{:>10.2f}{:1s}{:>16.2f}{:1s}{:>10.2f}{:1s}{:>10d}{:1s}{:>9d}{:1s}{:>17s}{:1s}{:>17s}{:1s}{:>7s}{:1s}{:>7s}{:1s}{:<42s}".format(
                 value, delim,
                 getpercent(value, hitcount), delim,
@@ -177,3 +178,5 @@ if __name__ == "__main__":
                 str_max_map_len(valstats[key]), delim,
                 str_max_map_len(valstats[key]), delim,
                 '"' + key + '"'))
+        except TypeError:
+            print("")
