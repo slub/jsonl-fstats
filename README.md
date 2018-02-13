@@ -14,11 +14,25 @@ jsonl-fstats
         -delimiter set which delimiter to use
 ```
 
+* example with input and output file:
+    ```
+    jsonl-fstats < [INPUT LINE-DELIMITED JSON DOCUMENT] > [OUTPUT STATISTICS DOCUMENT]
+    ```
+
 ## Requirements
 
-numpy
+[argparse](https://docs.python.org/3/library/argparse.html#module-argparse)
+[numpy](http://www.numpy.org/)
 
-e.g.
-```
-sudo apt-get install python3-numpy
-```
+### Install Requirements
+
+* via pip:
+    ```
+    sudo -H pip3 install --upgrade [ABSOLUTE PATH TO YOUR LOCAL GIT REPOSITORY OF JSONL-FSTATS]
+    ```
+    (which provides you ```jsonl-fstats``` as a system-wide commandline command)
+
+* or ,e.g., for a Debian-based Linux system:
+    ```
+    sudo apt-get install python3-numpy
+    ```
