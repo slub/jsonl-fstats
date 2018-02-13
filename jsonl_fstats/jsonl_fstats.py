@@ -55,7 +55,7 @@ def isint(num):
         return False
 
 
-def getpercent(val, total):
+def getpercent(value, hitcount):
     percent = (value) / float(hitcount) * 100
     if percent > 100:
         return 100
@@ -79,7 +79,7 @@ def marcString(string):
     return string
 
 
-if __name__ == "__main__":
+def run():
     parser = argparse.ArgumentParser(
         description='return field statistics of an line-delimited JSON Document or Input-Stream')
     parser.add_argument('-marc', action="store_true", help='Ignore Marc Indicator')
