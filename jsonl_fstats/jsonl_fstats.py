@@ -128,7 +128,7 @@ def run():
                 stats[path] += 1
             else:
                 stats[path] = 0 
-    if args.headless:
+    if not args.headless:
         print("Total Records: " + str(hitcount))
         print(
             "{:9s}{:1s}{:3s}{:1s}{:14s}{:1s}{:7s}{:1s}{:10s}{:1s}{:16s}{:1s}{:10s}{:1s}{:10s}{:1s}{:9s}{:1s}{:17s}{:1s}{:17s}{:1s}{:7s}{:1s}{:7s}{:1s}{:42s}".format(
