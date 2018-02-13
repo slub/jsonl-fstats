@@ -23,7 +23,8 @@ jsonl-fstats.py
 
 [numpy](http://www.numpy.org/)
 
-e.g. ```
+e.g. 
+```
 apt-get install python3-numpy
 ```
 
