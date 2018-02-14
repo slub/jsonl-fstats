@@ -19,13 +19,13 @@ def traverse(dict_or_list, path):
 
 def str_max_map_len(array):
     try:
-        return str(max(map(len, array), default=1))
+        return str(max(map(len, array), default=0))
     except TypeError:
         return ""
 
 def str_min_map_len(array):
     try:
-        return str(min(map(len, array), default=1))
+        return str(min(map(len, array), default=0))
     except TypeError:
         return ""
 
@@ -142,7 +142,10 @@ def run():
             data = []
             for obj in valstats[key]:
                 data.append(valstats[key][obj])
-        npdata = np.asarray(data)
+        if len(data) > 0:
+            npdata = np.asarray(data)
+        else:
+            npdata = np.asarray([' '])
         print(
             "{:>9d}{:1s}{:>3.0f}{:1s}{:>14d}{:1s}{:>7d}{:1s}{:>10.2f}{:1s}{:>16.2f}{:1s}{:>10.2f}{:1s}{:>10d}{:1s}{:>9d}{:1s}{:>17s}{:1s}{:>17s}{:1s}{:>7s}{:1s}{:>7s}{:1s}{:<42s}".format(
                 value, args.delimiter,
@@ -152,10 +155,10 @@ def run():
                 np.mean(npdata), args.delimiter,
                 np.var(npdata), args.delimiter,
                 np.std(npdata), args.delimiter,
-                max(data, default=1), args.delimiter,
-                min(data, default=1), args.delimiter,
-                '"' + str(max(valstats[key], key=lambda x: valstats[key][x], default=1))[0:15] + '"', args.delimiter,
-                '"' + str(min(valstats[key], key=lambda x: valstats[key][x], default=1))[0:15] + '"', args.delimiter,
+                max(data, default=0), args.delimiter,
+                min(data, default=0), args.delimiter,
+                '"' + str(max(valstats[key], key=lambda x: valstats[key][x], default=0))[0:15] + '"', args.delimiter,
+                '"' + str(min(valstats[key], key=lambda x: valstats[key][x], default=0))[0:15] + '"', args.delimiter,
                 str_max_map_len(valstats[key]), args.delimiter,
                 str_max_map_len(valstats[key]), args.delimiter,
                 '"' + key + '"'))
