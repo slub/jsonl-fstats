@@ -143,7 +143,7 @@ def run():
             for obj in valstats[key]:
                 data.append(valstats[key][obj])
         npdata = np.asarray(data)
-        try:
+        if data:
             print(
             "{:>9d}{:1s}{:>3.0f}{:1s}{:>14d}{:1s}{:>7d}{:1s}{:>10.2f}{:1s}{:>16.2f}{:1s}{:>10.2f}{:1s}{:>10d}{:1s}{:>9d}{:1s}{:>17s}{:1s}{:>17s}{:1s}{:>7s}{:1s}{:>7s}{:1s}{:<42s}".format(
                 value, args.delimiter,
@@ -160,8 +160,6 @@ def run():
                 str_max_map_len(valstats[key]), args.delimiter,
                 str_max_map_len(valstats[key]), args.delimiter,
                 '"' + key + '"'))
-        except TypeError:
-            print("")
 
 if __name__ == "__main__":
     run()
