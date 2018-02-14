@@ -19,13 +19,13 @@ def traverse(dict_or_list, path):
 
 def str_max_map_len(array):
     try:
-        return str(max(map(len, array)))
+        return str(max(map(len, array), default=0))
     except TypeError:
         return ""
 
 def str_min_map_len(array):
     try:
-        return str(min(map(len, array)))
+        return str(min(map(len, array), default=0))
     except TypeError:
         return ""
 
