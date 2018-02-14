@@ -82,7 +82,7 @@ def run():
     hitcount = 0
     stats = {}
     valstats = {}
-    
+
     for line in sys.stdin:
         try:
             jline = json.loads(line)
@@ -127,7 +127,7 @@ def run():
             if path in stats:
                 stats[path] += 1
             else:
-                stats[path] = 0 
+                stats[path] = 0
     if not args.headless:
         print("Total Records: " + str(hitcount))
         print(
@@ -143,8 +143,7 @@ def run():
             for obj in valstats[key]:
                 data.append(valstats[key][obj])
         npdata = np.asarray(data)
-        if data:
-            print(
+        print(
             "{:>9d}{:1s}{:>3.0f}{:1s}{:>14d}{:1s}{:>7d}{:1s}{:>10.2f}{:1s}{:>16.2f}{:1s}{:>10.2f}{:1s}{:>10d}{:1s}{:>9d}{:1s}{:>17s}{:1s}{:>17s}{:1s}{:>7s}{:1s}{:>7s}{:1s}{:<42s}".format(
                 value, args.delimiter,
                 getpercent(value, hitcount), args.delimiter,
