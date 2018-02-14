@@ -154,8 +154,8 @@ def run():
                 np.std(npdata), args.delimiter,
                 max(data, default=0), args.delimiter,
                 min(data, default=0), args.delimiter,
-                '"' + str(max(valstats[key], key=lambda x: valstats[key][x]))[0:15] + '"', args.delimiter,
-                '"' + str(min(valstats[key], key=lambda x: valstats[key][x]))[0:15] + '"', args.delimiter,
+                '"' + str(max(valstats[key], key=lambda x: valstats[key][x], default=0))[0:15] + '"', args.delimiter,
+                '"' + str(min(valstats[key], key=lambda x: valstats[key][x], default=0))[0:15] + '"', args.delimiter,
                 str_max_map_len(valstats[key]), args.delimiter,
                 str_max_map_len(valstats[key]), args.delimiter,
                 '"' + key + '"'))
