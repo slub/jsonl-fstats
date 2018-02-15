@@ -6,6 +6,7 @@ import json
 import sys
 import numpy as np
 
+
 def traverse(dict_or_list, path):
     if isinstance(dict_or_list, dict):
         iterator = dict_or_list.items()
@@ -17,17 +18,20 @@ def traverse(dict_or_list, path):
             for k, v in traverse(v, path + str([k])):
                 yield k, v
 
+
 def str_max_map_len(array):
     try:
-        return str(max(map(len, array)))
+        return str(max(map(len, array), default=0))
     except TypeError:
         return ""
 
+
 def str_min_map_len(array):
     try:
-        return str(min(map(len, array)))
+        return str(min(map(len, array), default=0))
     except TypeError:
         return ""
+
 
 def removebraces(string):
     if string[-1] == ']':
@@ -36,12 +40,14 @@ def removebraces(string):
         string = string[1:]
     return string
 
+
 def isint(num):
     try:
         int(num)
         return True
     except ValueError:
         return False
+
 
 def getpercent(value, hitcount):
     percent = (value) / float(hitcount) * 100
@@ -50,12 +56,14 @@ def getpercent(value, hitcount):
     else:
         return percent
 
+
 def getnotexisting(value, hitcount):
     notexisting = hitcount - value
     if notexisting < 0:
         return 0
     else:
         return notexisting
+
 
 def marcString(string):
     stringarr = string.split("###")
@@ -64,13 +72,14 @@ def marcString(string):
     string = stringarr[0] + " " + stringarr[-1]
     return string
 
+
 def run():
     parser = argparse.ArgumentParser(
         description='return field statistics of an line-delimited JSON Document or Input-Stream')
     parser.add_argument('-marc', action="store_true", help='Ignore Marc Indicator')
     parser.add_argument('-help', action="store_true", help='print more help')
     parser.add_argument('-headless', action="store_true", help='don\'t print head')
-    parser.add_argument('-delimiter',default="|",type=str, help='delimiter to use')
+    parser.add_argument('-delimiter', default="|", type=str, help='delimiter to use')
     args = parser.parse_args()
     if args.help:
         print("jsonl-fstats\n" \
@@ -82,7 +91,7 @@ def run():
     hitcount = 0
     stats = {}
     valstats = {}
-    
+
     for line in sys.stdin:
         try:
             jline = json.loads(line)
@@ -127,13 +136,15 @@ def run():
             if path in stats:
                 stats[path] += 1
             else:
-                stats[path] = 0 
+                stats[path] = 0
     if not args.headless:
         print("Total Records: " + str(hitcount))
         print(
             "{:9s}{:1s}{:3s}{:1s}{:14s}{:1s}{:7s}{:1s}{:10s}{:1s}{:16s}{:1s}{:10s}{:1s}{:10s}{:1s}{:9s}{:1s}{:17s}{:1s}{:17s}{:1s}{:7s}{:1s}{:7s}{:1s}{:42s}".format(
-                "existing", args.delimiter, "%", args.delimiter, "notexisting", args.delimiter, "unique", args.delimiter, "avg", args.delimiter, "var", args.delimiter, "std",
-                args.delimiter, "max", args.delimiter, "min", args.delimiter, "max-value", args.delimiter, "min-value", args.delimiter, "max-len", args.delimiter, "min-len",
+                "existing", args.delimiter, "%", args.delimiter, "notexisting", args.delimiter, "unique",
+                args.delimiter, "avg", args.delimiter, "var", args.delimiter, "std",
+                args.delimiter, "max", args.delimiter, "min", args.delimiter, "max-value", args.delimiter, "min-value",
+                args.delimiter, "max-len", args.delimiter, "min-len",
                 args.delimiter, "field name"))
     sortedstats = collections.OrderedDict(sorted(stats.items()))
     for key, value in sortedstats.items():
@@ -142,9 +153,11 @@ def run():
             data = []
             for obj in valstats[key]:
                 data.append(valstats[key][obj])
-        npdata = np.asarray(data)
-        if data:
-            print(
+        if len(data) > 0:
+            npdata = np.asarray(data)
+        else:
+            npdata = np.asarray([0])
+        print(
             "{:>9d}{:1s}{:>3.0f}{:1s}{:>14d}{:1s}{:>7d}{:1s}{:>10.2f}{:1s}{:>16.2f}{:1s}{:>10.2f}{:1s}{:>10d}{:1s}{:>9d}{:1s}{:>17s}{:1s}{:>17s}{:1s}{:>7s}{:1s}{:>7s}{:1s}{:<42s}".format(
                 value, args.delimiter,
                 getpercent(value, hitcount), args.delimiter,
@@ -153,13 +166,14 @@ def run():
                 np.mean(npdata), args.delimiter,
                 np.var(npdata), args.delimiter,
                 np.std(npdata), args.delimiter,
-                max(data), args.delimiter,
-                min(data), args.delimiter,
-                '"' + str(max(valstats[key], key=lambda x: valstats[key][x]))[0:15] + '"', args.delimiter,
-                '"' + str(min(valstats[key], key=lambda x: valstats[key][x]))[0:15] + '"', args.delimiter,
+                max(data, default=0), args.delimiter,
+                min(data, default=0), args.delimiter,
+                '"' + str(max(valstats[key], key=lambda x: valstats[key][x], default=0))[0:15] + '"', args.delimiter,
+                '"' + str(min(valstats[key], key=lambda x: valstats[key][x], default=0))[0:15] + '"', args.delimiter,
                 str_max_map_len(valstats[key]), args.delimiter,
                 str_max_map_len(valstats[key]), args.delimiter,
                 '"' + key + '"'))
+
 
 if __name__ == "__main__":
     run()
