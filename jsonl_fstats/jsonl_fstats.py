@@ -77,6 +77,7 @@ def run():
         exit()
     hitcount = 0
     stats = {}
+    percentage_stats={}
     valstats = {}
 
     for line in sys.stdin:
@@ -123,10 +124,14 @@ def run():
                 valstats[path] = {}
             if path not in recordstats: #append path to recordstats array by first iteration. after that, we ignore that path.
                 recordstats.append(path)
-                if path in stats:
-                    stats[path] += 1
+                if path in percentage_stats:
+                    percentage_stats[path] += 1
                 else:
-                    stats[path] = 1
+                    percentage_stats[path] = 1
+            if path in stats:
+                stats[path] += 1
+            else:
+                stats[path] = 1
     if not args.headless:
         print("Total Records: " + str(hitcount))
         print(
@@ -150,7 +155,7 @@ def run():
         print(
             "{:>9d}{:1s}{:>3.0f}{:1s}{:>14d}{:1s}{:>7d}{:1s}{:>10.2f}{:1s}{:>16.2f}{:1s}{:>10.2f}{:1s}{:>10d}{:1s}{:>9d}{:1s}{:>17s}{:1s}{:>17s}{:1s}{:>7s}{:1s}{:>7s}{:1s}{:<42s}".format(
                 value, args.delimiter,
-                getpercent(value, hitcount), args.delimiter,
+                getpercent(percentage_stats[key], hitcount), args.delimiter,
                 getnotexisting(value, hitcount), args.delimiter,
                 unique, args.delimiter,
                 np.mean(npdata), args.delimiter,
