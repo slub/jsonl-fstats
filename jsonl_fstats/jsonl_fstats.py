@@ -20,26 +20,17 @@ def traverse(dict_or_list, path):
 
 
 def str_max_map_len(array):
-    try:
-        return str(max(map(len, array), default=0))
-    except TypeError:
-        return ""
-
+    return str(max(map(len, array), default=0))
 
 def str_min_map_len(array):
-    try:
-        return str(min(map(len, array), default=0))
-    except TypeError:
-        return ""
-
-
+    return str(min(map(len, array), default=0))
+    
 def removebraces(string):
     if string[-1] == ']':
         string = string[:-1]
     if string[0] == '[':
         string = string[1:]
     return string
-
 
 def isint(num):
     try:
@@ -50,11 +41,7 @@ def isint(num):
 
 
 def getpercent(value, hitcount):
-    percent = (value) / float(hitcount) * 100
-    if percent > 100:
-        return 100
-    else:
-        return percent
+    return (value) / float(hitcount) * 100
 
 
 def getnotexisting(value, hitcount):
@@ -93,6 +80,7 @@ def run():
     valstats = {}
 
     for line in sys.stdin:
+        recordstats=[]      #array to save the field paths per record, so we don't count paths twice (e.g. array-elements)
         try:
             jline = json.loads(line)
             hitcount += 1
@@ -133,10 +121,12 @@ def run():
                     valstats[path][str(val)] = 1
             else:
                 valstats[path] = {}
-            if path in stats:
-                stats[path] += 1
-            else:
-                stats[path] = 0
+            if path not in recordstats: #append path to recordstats array by first iteration. after that, we ignore that path.
+                recordstats.append(path)
+                if path in stats:
+                    stats[path] += 1
+                else:
+                    stats[path] = 1
     if not args.headless:
         print("Total Records: " + str(hitcount))
         print(
