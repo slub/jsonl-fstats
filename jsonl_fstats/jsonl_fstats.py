@@ -66,14 +66,16 @@ def run():
     parser.add_argument('-marc', action="store_true", help='Ignore Marc Indicator')
     parser.add_argument('-help', action="store_true", help='print more help')
     parser.add_argument('-headless', action="store_true", help='don\'t print head')
+    parser.add_argument('-no_whitespace',action="store_true",help='don\'t count empty strings')
     parser.add_argument('-delimiter', default="|", type=str, help='delimiter to use')
     args = parser.parse_args()
     if args.help:
         print("jsonl-fstats\n" \
-              "        -help      print this help\n" \
-              "        -marc      ignore Marc identifier field if you are analysing an index of marc records\n" \
-              "        -headless  don't print headline\n" \
-              "        -delimiter set which delimiter to use\n")
+              "        -help            print this help\n" \
+              "        -marc            ignore Marc identifier field if you are analysing an index of marc records\n" \
+              "        -no_whitespace   don\'t count empty strings\n"\
+              "        -headless        don't print headline\n" \
+              "        -delimiter       set which delimiter to use\n")
         exit()
     hitcount = 0
     stats = {}
@@ -90,8 +92,8 @@ def run():
             print(line)
             continue
         for key, val in traverse(jline, ""):
-            if isinstance(val, list):
-                continue
+            if isinstance(val, list) or (isinstance(val,str) and args.no_whitespace and (not val or val.isspace())):
+                continue #ignore vals which are lists or empty strings
             path = ""
             fields = key.replace("'", "").split("][")
             lastfield = removebraces(fields[-1])
