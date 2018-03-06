@@ -6,17 +6,31 @@ import json
 import sys
 import numpy as np
 
+        
+def eprint(*args, **kwargs):
+    print(*args, file=sys.stderr, **kwargs)
 
 def traverse(dict_or_list, path):
+    iterator=None
     if isinstance(dict_or_list, dict):
         iterator = dict_or_list.items()
     elif isinstance(dict_or_list, list):
         iterator = enumerate(dict_or_list)
-    for k, v in iterator:
-        yield path + str([k]), v
-        if isinstance(v, (dict, list)):
-            for k, v in traverse(v, path + str([k])):
-                yield k, v
+    else:
+        yield path,dict_or_list
+    if iterator:
+        for k, v in iterator:
+            if isinstance(dict_or_list,dict):
+                yield path + str([k]), v
+                for k, v in traverse(v, path + str([k])):
+                    yield k, v
+            elif isinstance(dict_or_list,list):
+                yield path, v
+                for k, v in traverse(v, path):
+                    yield k, v
+#        if isinstance(v, (dict, list)):
+#            for k, v in traverse(v, path + str([k])):
+#                yield k, v
 
 
 def str_max_map_len(array):
@@ -66,14 +80,16 @@ def run():
     parser.add_argument('-marc', action="store_true", help='Ignore Marc Indicator')
     parser.add_argument('-help', action="store_true", help='print more help')
     parser.add_argument('-headless', action="store_true", help='don\'t print head')
+    parser.add_argument('-len_val', type=str,default="17", help='don\'t print head')
     parser.add_argument('-delimiter', default="|", type=str, help='delimiter to use')
     args = parser.parse_args()
     if args.help:
         print("jsonl-fstats\n" \
-              "        -help      print this help\n" \
-              "        -marc      ignore Marc identifier field if you are analysing an index of marc records\n" \
-              "        -headless  don't print headline\n" \
-              "        -delimiter set which delimiter to use\n")
+              "        -help        print this help\n" \
+              "        -marc        ignore Marc identifier field if you are analysing an index of marc records\n" \
+              "        -headless    don't print headline\n" \
+              "        -len_val     length of values to print into table. Default is \n" \
+              "        -delimiter   set which delimiter to use\n")
         exit()
     hitcount = 0
     stats = {}
@@ -86,8 +102,8 @@ def run():
             jline = json.loads(line)
             hitcount += 1
         except ValueError:
-            print("unclean jsonline: ")
-            print(line)
+            eprint("unclean jsonline: ")
+            eprint(line)
             continue
         for key, val in traverse(jline, ""):
             if isinstance(val, list):
@@ -98,15 +114,13 @@ def run():
             for field in fields:
                 field = removebraces(field)
                 if path:
-                    if args.marc == False:
-                        if isint(field):
-                            continue
-                        path = path + " > " + field
-                    elif args.marc == True:
+                    if args.marc:
                         path = path + "###" + field
+                    else:
+                        path = path + " > " + field
                 else:
                     path = field
-            if args.marc == True:
+            if args.marc:
                 path = marcString(path)
                 if not path:
                     continue
@@ -134,13 +148,24 @@ def run():
                 stats[path] = 1
     if not args.headless:
         print("Total Records: " + str(hitcount))
-        print(
-            "{:9s}{:1s}{:3s}{:1s}{:14s}{:1s}{:7s}{:1s}{:10s}{:1s}{:16s}{:1s}{:10s}{:1s}{:10s}{:1s}{:9s}{:1s}{:17s}{:1s}{:17s}{:1s}{:7s}{:1s}{:7s}{:1s}{:42s}".format(
-                "existing", args.delimiter, "%", args.delimiter, "notexisting", args.delimiter, "unique",
-                args.delimiter, "avg", args.delimiter, "var", args.delimiter, "std",
-                args.delimiter, "max", args.delimiter, "min", args.delimiter, "max-value", args.delimiter, "min-value",
-                args.delimiter, "max-len", args.delimiter, "min-len",
-                args.delimiter, "field name"))
+        format_string=str("{:8s}{:1s}{:9s}{:1s}{:6s}{:1s}{:6s}{:1s}{:14s}{:1s}{:7s}{:1s}{:10s}{:1s}{:16s}{:1s}{:10s}{:1s}{:10s}{:1s}{:9s}{:1s}"+"{:"+args.len_val+"s}"+"{:1s}"+"{:"+args.len_val+"s}"+"{:1s}{:7s}{:1s}{:7s}{:1s}{:40s}")
+        print(format_string.format(
+                "existing", args.delimiter,
+                "occurance", args.delimiter,
+                "%", args.delimiter,
+                "!%", args.delimiter,
+                "notexisting", args.delimiter,
+                "unique", args.delimiter, 
+                "avg", args.delimiter, 
+                "var", args.delimiter, 
+                "std",args.delimiter, 
+                "max", args.delimiter, 
+                "min", args.delimiter, 
+                "max-value",args.delimiter, 
+                "min-value",args.delimiter, 
+                "max-len", args.delimiter, 
+                "min-len", args.delimiter, 
+                "field name"))
     sortedstats = collections.OrderedDict(sorted(stats.items()))
     for key, value in sortedstats.items():
         if key in valstats:
@@ -152,10 +177,12 @@ def run():
             npdata = np.asarray(data)
         else:
             npdata = np.asarray([0])
-        print(
-            "{:>9d}{:1s}{:>3.0f}{:1s}{:>14d}{:1s}{:>7d}{:1s}{:>10.2f}{:1s}{:>16.2f}{:1s}{:>10.2f}{:1s}{:>10d}{:1s}{:>9d}{:1s}{:>17s}{:1s}{:>17s}{:1s}{:>7s}{:1s}{:>7s}{:1s}{:<42s}".format(
+        format_string=str("{:>8.0f}{:1s}{:>9d}{:1s}{:>6.2f}{:1s}{:>6.2f}{:1s}{:>14d}{:1s}{:>7d}{:1s}{:>10.2f}{:1s}{:>16.2f}{:1s}{:>10.2f}{:1s}{:>10d}{:1s}{:>9d}{:1s}"+"{:>"+args.len_val+"s}"+"{:1s}{:>"+args.len_val+"s}{:1s}{:>7s}{:1s}{:>7s}{:1s}{:<40s}")
+        print(format_string.format(
+                percentage_stats[key], args.delimiter,
                 value, args.delimiter,
                 getpercent(percentage_stats[key], hitcount), args.delimiter,
+                getpercent(getnotexisting(percentage_stats[key], hitcount),hitcount),args.delimiter,
                 getnotexisting(value, hitcount), args.delimiter,
                 unique, args.delimiter,
                 np.mean(npdata), args.delimiter,
@@ -163,11 +190,12 @@ def run():
                 np.std(npdata), args.delimiter,
                 max(data, default=0), args.delimiter,
                 min(data, default=0), args.delimiter,
-                '"' + str(max(valstats[key], key=lambda x: valstats[key][x], default=0))[0:15] + '"', args.delimiter,
-                '"' + str(min(valstats[key], key=lambda x: valstats[key][x], default=0))[0:15] + '"', args.delimiter,
+                '"' + str(max(valstats[key], key=lambda x: valstats[key][x], default=0)).strip()[0:int(args.len_val)-2] + '"', args.delimiter,
+                '"' + str(min(valstats[key], key=lambda x: valstats[key][x], default=0)).strip()[0:int(args.len_val)-2] + '"', args.delimiter,
                 str_max_map_len(valstats[key]), args.delimiter,
                 str_max_map_len(valstats[key]), args.delimiter,
                 '"' + key + '"'))
+
 
 
 if __name__ == "__main__":
