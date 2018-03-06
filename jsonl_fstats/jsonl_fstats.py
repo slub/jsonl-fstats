@@ -81,16 +81,11 @@ def run():
     parser.add_argument('-help', action="store_true", help='print more help')
     parser.add_argument('-headless', action="store_true", help='don\'t print head')
     parser.add_argument('-len_val', type=str,default="17", help='don\'t print head')
+    parser.add_argument('-no_whitespace', default="|", type=str, help='don\'t count val with whitespacewhitespace')
     parser.add_argument('-delimiter', default="|", type=str, help='delimiter to use')
     args = parser.parse_args()
     if args.help:
-        print("jsonl-fstats\n" \
-              "        -help        print this help\n" \
-              "        -marc        ignore Marc identifier field if you are analysing an index of marc records\n" \
-              "        -headless    don't print headline\n" \
-              "        -len_val     length of values to print into table. Default is \n" \
-              "        -delimiter   set which delimiter to use\n")
-        exit()
+        parser.print_usage(sys.stderr)
     hitcount = 0
     stats = {}
     percentage_stats={}
@@ -106,8 +101,8 @@ def run():
             eprint(line)
             continue
         for key, val in traverse(jline, ""):
-            if isinstance(val, list):
-                continue
+            if isinstance(val, list) or (isinstance(val,str) and args.no_whitespace and (not val or val.isspace())):
+                continue #ignore vals which are lists or empty strings
             path = ""
             fields = key.replace("'", "").split("][")
             lastfield = removebraces(fields[-1])
