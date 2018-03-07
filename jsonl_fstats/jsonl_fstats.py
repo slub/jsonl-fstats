@@ -6,15 +6,13 @@ import json
 import sys
 import numpy as np
 
-        
 def eprint(*args, **kwargs):
     print(*args, file=sys.stderr, **kwargs)
-
 
 def traverse(obj,path):
     if isinstance(obj,dict):
         for k,v in obj.items():
-            for c,w in traverse(v,str(path)+"#!?#!?#!?"+str(k)):
+            for c,w in traverse(v,path+"#!?#!?#!?"+str(k)):
                 yield c,w
     elif isinstance(obj,list):
         for elem in obj:
@@ -35,25 +33,9 @@ def str_max_map_len(array):
 
 def str_min_map_len(array):
     return str(min(map(len, array), default=0))
-    
-def removebraces(string):
-    if string[-1] == ']':
-        string = string[:-1]
-    if string[0] == '[':
-        string = string[1:]
-    return string
-
-def isint(num):
-    try:
-        int(num)
-        return True
-    except ValueError:
-        return False
-
 
 def getpercent(value, hitcount):
     return (value) / float(hitcount) * 100
-
 
 def getnotexisting(value, hitcount):
     notexisting = hitcount - value
@@ -61,15 +43,6 @@ def getnotexisting(value, hitcount):
         return 0
     else:
         return notexisting
-
-
-def marcString(string):
-    stringarr = string.split("###")
-    if (len(stringarr) == 1) or '_' in stringarr[-1]:
-        return ""
-    string = stringarr[0] + " " + stringarr[-1]
-    return string
-
 
 def run():
     parser = argparse.ArgumentParser(
@@ -88,7 +61,6 @@ def run():
     stats = {}
     percentage_stats={}
     valstats = {}
-
     for line in sys.stdin:
         recordstats=[]      #array to save the field paths per record, so we don't count paths twice (e.g. array-elements)
         try:
@@ -101,34 +73,19 @@ def run():
         for key, val in traverse(jline, ""):
             if isinstance(val, list) or (isinstance(val,str) and args.no_whitespace and (not val or val.isspace())):
                 continue #ignore vals which are lists or empty strings
-            path = ""
-            fields = key.replace("'", "").split("][")
-            lastfield = removebraces(fields[-1])
-            for field in fields:
-                field = removebraces(field)
-                if path:
-                    if args.marc:
-                        path = path + "###" + field
-                    else:
-                        path = path + " > " + field
-                else:
-                    path = field
+            path=getname(key)
             if args.marc:
-                path = marcString(path)
-                if not path:
-                    continue
-                if path[-2] != ' ':
-                    continue
-                if path[-1] != '0' and isint(path[-1]) and int(path[0:3]) > 10:
-                    continue
-            if path in valstats:
-                if str(val) in valstats[path]:
-                    valstats[path][str(val)] += 1
-                else:
-                    valstats[path][str(val)] = {}
-                    valstats[path][str(val)] = 1
+                array=key.rsplit("#!?#!?#!?")
+                if len(array)>=4:
+                    del array[2]
+                    path="".join(array)
+            if path not in valstats:
+                valstats[path]={}
+            if str(val) in valstats[path]:
+                valstats[path][str(val)] += 1
             else:
-                valstats[path] = {}
+                valstats[path][str(val)] = {}
+                valstats[path][str(val)] = 1
             if path not in recordstats: #append path to recordstats array by first iteration. after that, we ignore that path.
                 recordstats.append(path)
                 if path in percentage_stats:
@@ -187,9 +144,7 @@ def run():
                 '"' + str(min(valstats[key], key=lambda x: valstats[key][x], default=0)).strip()[0:int(args.len_val)-2] + '"', args.delimiter,
                 str_max_map_len(valstats[key]), args.delimiter,
                 str_max_map_len(valstats[key]), args.delimiter,
-                '"' + getname(key) + '"'))
-
-
+                '"' + key + '"'))
 
 if __name__ == "__main__":
     run()
