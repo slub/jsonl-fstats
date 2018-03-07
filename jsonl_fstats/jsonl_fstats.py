@@ -10,28 +10,25 @@ import numpy as np
 def eprint(*args, **kwargs):
     print(*args, file=sys.stderr, **kwargs)
 
-def traverse(dict_or_list, path):
-    iterator=None
-    if isinstance(dict_or_list, dict):
-        iterator = dict_or_list.items()
-    elif isinstance(dict_or_list, list):
-        iterator = enumerate(dict_or_list)
-    else:
-        yield path,dict_or_list
-    if iterator:
-        for k, v in iterator:
-            if isinstance(dict_or_list,dict):
-                yield path + str([k]), v
-                for k, v in traverse(v, path + str([k])):
-                    yield k, v
-            elif isinstance(dict_or_list,list):
-                yield path, v
-                for k, v in traverse(v, path):
-                    yield k, v
-#        if isinstance(v, (dict, list)):
-#            for k, v in traverse(v, path + str([k])):
-#                yield k, v
 
+def traverse(obj,path):
+    if isinstance(obj,dict):
+        for k,v in obj.items():
+            for c,w in traverse(v,str(path)+"#!?#!?#!?"+str(k)):
+                yield c,w
+    elif isinstance(obj,list):
+        for elem in obj:
+            for c,w in traverse(elem,str(path)):
+                yield c,w
+    else:
+        yield path,obj
+
+def getname(string):
+    array=string.rsplit("#!?#!?#!?")
+    rstr=array[0]
+    for elem in array[1:-1]:
+        rstr=rstr+elem+" > "
+    return rstr+array[-1]
 
 def str_max_map_len(array):
     return str(max(map(len, array), default=0))
@@ -146,7 +143,7 @@ def run():
         format_string=str("{:8s}{:1s}{:9s}{:1s}{:6s}{:1s}{:6s}{:1s}{:14s}{:1s}{:7s}{:1s}{:10s}{:1s}{:16s}{:1s}{:10s}{:1s}{:10s}{:1s}{:9s}{:1s}"+"{:"+args.len_val+"s}"+"{:1s}"+"{:"+args.len_val+"s}"+"{:1s}{:7s}{:1s}{:7s}{:1s}{:40s}")
         print(format_string.format(
                 "existing", args.delimiter,
-                "occurance", args.delimiter,
+                "occurence", args.delimiter,
                 "%", args.delimiter,
                 "!%", args.delimiter,
                 "notexisting", args.delimiter,
@@ -189,7 +186,7 @@ def run():
                 '"' + str(min(valstats[key], key=lambda x: valstats[key][x], default=0)).strip()[0:int(args.len_val)-2] + '"', args.delimiter,
                 str_max_map_len(valstats[key]), args.delimiter,
                 str_max_map_len(valstats[key]), args.delimiter,
-                '"' + key + '"'))
+                '"' + getname(key) + '"'))
 
 
 
