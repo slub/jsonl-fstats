@@ -83,6 +83,7 @@ def run():
     args = parser.parse_args()
     if args.help:
         parser.print_usage(sys.stderr)
+        exit(-1)
     hitcount = 0
     stats = {}
     percentage_stats={}
