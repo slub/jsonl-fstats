@@ -65,7 +65,7 @@ apt-get install python3-numpy
 * ^ percentage of 'existing'
 * (existing / Total Records * 100)
 
-##### !%
+#### !%
 * ^ percentage of 'notexisting'
 * (not existing / Total Records * 100)
 
@@ -121,7 +121,7 @@ Erklärung der Spaltenköpfe
 * existing in Prozent
 * existing / Total Records * 100
 
-##### !%
+#### !%
 * notexisting in Prozent
 * notexisting / Total Records * 100)
 
