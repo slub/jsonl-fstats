@@ -101,7 +101,7 @@ def run():
         format_string=str("{:8s}{:1s}{:9s}{:1s}{:6s}{:1s}{:6s}{:1s}{:14s}{:1s}{:7s}{:1s}{:10s}{:1s}{:16s}{:1s}{:10s}{:1s}{:10s}{:1s}{:9s}{:1s}"+"{:"+args.len_val+"s}"+"{:1s}"+"{:"+args.len_val+"s}"+"{:1s}{:7s}{:1s}{:7s}{:1s}{:40s}")
         print(format_string.format(
                 "existing", args.delimiter,
-                "occurence", args.delimiter,
+                "occurrence", args.delimiter,
                 "%", args.delimiter,
                 "!%", args.delimiter,
                 "notexisting", args.delimiter,
