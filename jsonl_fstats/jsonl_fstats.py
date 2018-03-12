@@ -18,7 +18,7 @@ def traverse(obj,path):
         for elem in obj:
             for c,w in traverse(elem,path+"#!?#!?#!?"):
                 yield c,w
-    else:
+    if len(path)>0 and not isinstance(obj,list):
         yield path,obj
 
 def getname(string):
@@ -27,6 +27,11 @@ def getname(string):
     for elem in array[1:-1]:
         rstr=rstr+elem+" > "
     return rstr+array[-1]
+
+def shortname(string):
+    if string[-2:]=="> ":
+        string=string[:-2]
+    return string.replace(">  >",">").strip()
 
 def str_max_map_len(array):
     return str(max(map(len, array), default=0))
@@ -145,7 +150,7 @@ def run():
                 '"' + str(min(valstats[key], key=lambda x: valstats[key][x], default=0)).strip()[0:int(args.len_val)-2] + '"', args.delimiter,
                 str_max_map_len(valstats[key]), args.delimiter,
                 str_max_map_len(valstats[key]), args.delimiter,
-                '"' + key + '"'))
+                '"' + shortname(key) + '"'))
 
 if __name__ == "__main__":
     run()
