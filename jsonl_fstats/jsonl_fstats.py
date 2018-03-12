@@ -84,6 +84,7 @@ def run():
                 if len(array)>=4:
                     array[3]=" > "
                     path="".join(array)
+            path=shortname(path)
             if path not in valstats:
                 valstats[path]={}
             if str(val) in valstats[path]:
@@ -150,7 +151,7 @@ def run():
                 '"' + str(min(valstats[key], key=lambda x: valstats[key][x], default=0)).strip()[0:int(args.len_val)-2] + '"', args.delimiter,
                 str_max_map_len(valstats[key]), args.delimiter,
                 str_max_map_len(valstats[key]), args.delimiter,
-                '"' + shortname(key) + '"'))
+                '"' + key + '"'))
 
 if __name__ == "__main__":
     run()
