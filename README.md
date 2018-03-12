@@ -9,7 +9,7 @@ It reads from stdin and prints to stdout.
 ```
 jsonl-fstats.py 
         -help      print this help
-        -marc      ignore Marc identifier field if you are analysing an index of marc records
+        -marc      ignore Marc indicator field if you are analysing an index of marc records
         -headless  don't print headline
         -delimiter set which delimiter to use
 ```
