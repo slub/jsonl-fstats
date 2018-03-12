@@ -16,7 +16,7 @@ def traverse(obj,path):
                 yield c,w
     elif isinstance(obj,list):
         for elem in obj:
-            for c,w in traverse(elem,str(path)):
+            for c,w in traverse(elem,path+"#!?#!?#!?"):
                 yield c,w
     else:
         yield path,obj
@@ -71,13 +71,13 @@ def run():
             eprint(line)
             continue
         for key, val in traverse(jline, ""):
-            if isinstance(val, list) or (isinstance(val,str) and args.no_whitespace and (not val or val.isspace())):
+            if (isinstance(val,str) and args.no_whitespace and (not val or val.isspace())):
                 continue #ignore vals which are lists or empty strings
             path=getname(key)
             if args.marc:
                 array=key.rsplit("#!?#!?#!?")
                 if len(array)>=4:
-                    del array[2]
+                    array[3]=" > "
                     path="".join(array)
             if path not in valstats:
                 valstats[path]={}
@@ -96,6 +96,7 @@ def run():
                 stats[path] += 1
             else:
                 stats[path] = 1
+            #eprint(path)
     if not args.headless:
         print("Total Records: " + str(hitcount))
         format_string=str("{:8s}{:1s}{:9s}{:1s}{:6s}{:1s}{:6s}{:1s}{:14s}{:1s}{:7s}{:1s}{:10s}{:1s}{:16s}{:1s}{:10s}{:1s}{:10s}{:1s}{:9s}{:1s}"+"{:"+args.len_val+"s}"+"{:1s}"+"{:"+args.len_val+"s}"+"{:1s}{:7s}{:1s}{:7s}{:1s}{:40s}")
