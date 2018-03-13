@@ -8,7 +8,7 @@ except ImportError:
     from distutils.core import setup
 
 setup(name='jsonl_fstats',
-      version='0.0.1',
+      version='1.0',
       description='a Python3 program that extracts some statistics regarding field coverage in a line-delimited JSON document',
       url='https://github.com/slub/jsonl-fstats',
       author='Bernhard Hering',
