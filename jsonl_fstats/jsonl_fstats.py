@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 import argparse
 import collections
+import csv
 import json
 import sys
 
@@ -23,6 +24,25 @@ MIN_VALUE = 'min_value'
 MAX_LEN = 'max_len'
 MIN_LEN = 'min_len'
 FIELD_NAME = 'field_name'
+
+
+def get_header():
+    return [EXISTING,
+            OCCURRENCE,
+            EXISTING_PERCENTAGE,
+            NOTEXISTING_PERCENTAGE,
+            NOTEXISTING,
+            UNIQUE,
+            AVG,
+            VAR,
+            STD,
+            MAX,
+            MIN,
+            MAX_VALUE,
+            MIN_VALUE,
+            MAX_LEN,
+            MIN_LEN,
+            FIELD_NAME]
 
 
 def eprint(*args, **kwargs):
@@ -94,7 +114,8 @@ def generate_field_statistics(statsmap, valstats, percentage_stats, hitcount, le
             EXISTING: "{0:.0f}".format(percentage_stats[key]),
             OCCURRENCE: value,
             EXISTING_PERCENTAGE: "{0:.2f}".format(getpercent(percentage_stats[key], hitcount)),
-            NOTEXISTING_PERCENTAGE: "{0:.2f}".format(getpercent(getnotexisting(percentage_stats[key], hitcount), hitcount)),
+            NOTEXISTING_PERCENTAGE: "{0:.2f}".format(
+                getpercent(getnotexisting(percentage_stats[key], hitcount), hitcount)),
             NOTEXISTING: getnotexisting(value, hitcount),
             UNIQUE: unique,
             AVG: "{0:.2f}".format(np.mean(npdata)),
@@ -157,6 +178,16 @@ def simple_text_print(field_statistics, hitcount, headless, delimiter, len_val):
             '"' + field_statistic[FIELD_NAME] + '"'))
 
 
+def csv_print(field_statistics):
+    header = get_header()
+    with sys.stdout as csvfile:
+        writer = csv.DictWriter(csvfile, fieldnames=header, dialect='unix')
+
+        writer.writeheader()
+        for field_statistic in field_statistics:
+            writer.writerow(field_statistic)
+
+
 def run():
     parser = argparse.ArgumentParser(
         description='return field statistics of an line-delimited JSON Document or Input-Stream')
@@ -166,6 +197,8 @@ def run():
     parser.add_argument('-len_val', type=str, default="17", help='don\'t print head')
     parser.add_argument('-no_whitespace', default="|", type=str, help='don\'t count val with whitespacewhitespace')
     parser.add_argument('-delimiter', default="|", type=str, help='delimiter to use')
+    parser.add_argument('-csv-output', action="store_true",
+                        help='prints the output as pure CSV data (all values are quoted)', dest='csv_output')
     args = parser.parse_args()
     if args.help:
         parser.print_usage(sys.stderr)
@@ -212,8 +245,12 @@ def run():
                 stats[path] = 1
             # eprint(path)
     sortedstats = collections.OrderedDict(sorted(stats.items()))
-    field_statistics = generate_field_statistics(sortedstats.items(), valstats, percentage_stats, hitcount, args.len_val)
-    simple_text_print(field_statistics, hitcount, args.headless, args.delimiter, args.len_val)
+    field_statistics = generate_field_statistics(sortedstats.items(), valstats, percentage_stats, hitcount,
+                                                 args.len_val)
+    if not args.csv_output:
+        simple_text_print(field_statistics, hitcount, args.headless, args.delimiter, args.len_val)
+    else:
+        csv_print(field_statistics)
 
 
 if __name__ == "__main__":
