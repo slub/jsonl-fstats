@@ -13,7 +13,7 @@ jsonl-fstats.py
         -help                           print more help
         -headless                       don't print header
         -len_val LEN_VAL                specify the length for the values of "max-value" and "min-value"
-        -no_whitespace NO_WHITESPACE    don't count val with whitespace
+        -no_whitespace NO_WHITESPACE    don't count values only including whitespaces
         -delimiter DELIMITER            delimiter to use
         -csv-output                     prints the output as pure CSV data (all values are quoted)
 ```

@@ -196,7 +196,7 @@ def run():
     parser.add_argument('-headless', action="store_true", help='don\'t print header')
     parser.add_argument('-len_val', type=str, default="17",
                         help='specify the length for the values of "max-value" and "min-value"')
-    parser.add_argument('-no_whitespace', default="|", type=str, help='don\'t count val with whitespace')
+    parser.add_argument('-no_whitespace', default="|", type=str, help='don\'t count values only including whitespaces')
     parser.add_argument('-delimiter', default="|", type=str, help='delimiter to use')
     parser.add_argument('-csv-output', action="store_true",
                         help='prints the output as pure CSV data (all values are quoted)', dest='csv_output')
