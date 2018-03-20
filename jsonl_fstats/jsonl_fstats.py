@@ -7,6 +7,23 @@ import sys
 
 import numpy as np
 
+EXISTING = 'existing'
+OCCURRENCE = 'occurrence'
+EXISTING_PERCENTAGE = 'existing_percentage'
+NOTEXISTING_PERCENTAGE = 'notexisting_percentage'
+NOTEXISTING = 'notexisting'
+UNIQUE = 'unique'
+AVG = 'avg'
+VAR = 'var'
+STD = 'std'
+MAX = 'max'
+MIN = 'min'
+MAX_VALUE = 'max_value'
+MIN_VALUE = 'min_value'
+MAX_LEN = 'max_len'
+MIN_LEN = 'min_len'
+FIELD_NAME = 'field_name'
+
 
 def eprint(*args, **kwargs):
     print(*args, file=sys.stderr, **kwargs)
@@ -57,6 +74,87 @@ def getnotexisting(value, hitcount):
         return 0
     else:
         return notexisting
+
+
+def generate_field_statistics(statsmap, valstats, percentage_stats, hitcount, len_val):
+    field_statistics = []
+    for key, value in statsmap:
+        unique = None
+        if key in valstats:
+            unique = len(valstats[key])
+            data = []
+            for obj in valstats[key]:
+                data.append(valstats[key][obj])
+        if len(data) > 0:
+            npdata = np.asarray(data)
+        else:
+            npdata = np.asarray([0])
+
+        field_statistic = {
+            EXISTING: "{0:.0f}".format(percentage_stats[key]),
+            OCCURRENCE: value,
+            EXISTING_PERCENTAGE: "{0:.0f}".format(getpercent(percentage_stats[key], hitcount)),
+            NOTEXISTING_PERCENTAGE: "{0:.0f}".format(getpercent(getnotexisting(percentage_stats[key], hitcount), hitcount)),
+            NOTEXISTING: getnotexisting(value, hitcount),
+            UNIQUE: unique,
+            AVG: "{0:.0f}".format(np.mean(npdata)),
+            VAR: "{0:.0f}".format(np.var(npdata)),
+            STD: "{0:.0f}".format(np.std(npdata)),
+            MAX: max(data, default=0),
+            MIN: min(data, default=0),
+            MAX_VALUE: str(max(valstats[key], key=lambda x: valstats[key][x], default=0)).strip()[0:int(len_val) - 2],
+            MIN_VALUE: str(min(valstats[key], key=lambda x: valstats[key][x], default=0)).strip()[0:int(len_val) - 2],
+            MAX_LEN: str_max_map_len(valstats[key]),
+            MIN_LEN: str_max_map_len(valstats[key]),
+            FIELD_NAME: key}
+
+        field_statistics.append(field_statistic)
+
+    return field_statistics
+
+
+def simple_text_print(field_statistics, hitcount, headless, delimiter, len_val):
+    if not headless:
+        print("Total Records: " + str(hitcount))
+        format_string = str(
+            "{:8s}{:1s}{:9s}{:1s}{:6s}{:1s}{:6s}{:1s}{:14s}{:1s}{:7s}{:1s}{:10s}{:1s}{:16s}{:1s}{:10s}{:1s}{:10s}{:1s}{:9s}{:1s}" + "{:" + len_val + "s}" + "{:1s}" + "{:" + len_val + "s}" + "{:1s}{:7s}{:1s}{:7s}{:1s}{:40s}")
+        print(format_string.format(
+            "existing", delimiter,
+            "occurrence", delimiter,
+            "%", delimiter,
+            "!%", delimiter,
+            "notexisting", delimiter,
+            "unique", delimiter,
+            "avg", delimiter,
+            "var", delimiter,
+            "std", delimiter,
+            "max", delimiter,
+            "min", delimiter,
+            "max-value", delimiter,
+            "min-value", delimiter,
+            "max-len", delimiter,
+            "min-len", delimiter,
+            "field name"))
+    for field_statistic in field_statistics:
+        format_string = str(
+            "{:>8.0f}{:1s}{:>9d}{:1s}{:>6.2f}{:1s}{:>6.2f}{:1s}{:>14d}{:1s}{:>7d}{:1s}{:>10.2f}{:1s}{:>16.2f}{:1s}{:>10.2f}{:1s}{:>10d}{:1s}{:>9d}{:1s}" + "{:>" + len_val + "s}" + "{:1s}{:>" + len_val + "s}{:1s}{:>7s}{:1s}{:>7s}{:1s}{:<40s}")
+        print(format_string.format(
+            float(field_statistic[EXISTING]), delimiter,
+            int(field_statistic[OCCURRENCE]), delimiter,
+            float(field_statistic[EXISTING_PERCENTAGE]), delimiter,
+            float(field_statistic[NOTEXISTING_PERCENTAGE]), delimiter,
+            int(field_statistic[NOTEXISTING]), delimiter,
+            int(field_statistic[UNIQUE]), delimiter,
+            float(field_statistic[AVG]), delimiter,
+            float(field_statistic[VAR]), delimiter,
+            float(field_statistic[STD]), delimiter,
+            int(field_statistic[MAX]), delimiter,
+            int(field_statistic[MIN]), delimiter,
+            '"' + field_statistic[MAX_VALUE] + '"', delimiter,
+            '"' + field_statistic[MIN_VALUE] + '"', delimiter,
+            field_statistic[MAX_LEN], delimiter,
+            field_statistic[MIN_LEN], delimiter,
+            '"' + field_statistic[FIELD_NAME] + '"'))
 
 
 def run():
@@ -113,59 +211,9 @@ def run():
             else:
                 stats[path] = 1
             # eprint(path)
-    if not args.headless:
-        print("Total Records: " + str(hitcount))
-        format_string = str(
-            "{:8s}{:1s}{:9s}{:1s}{:6s}{:1s}{:6s}{:1s}{:14s}{:1s}{:7s}{:1s}{:10s}{:1s}{:16s}{:1s}{:10s}{:1s}{:10s}{:1s}{:9s}{:1s}" + "{:" + args.len_val + "s}" + "{:1s}" + "{:" + args.len_val + "s}" + "{:1s}{:7s}{:1s}{:7s}{:1s}{:40s}")
-        print(format_string.format(
-            "existing", args.delimiter,
-            "occurrence", args.delimiter,
-            "%", args.delimiter,
-            "!%", args.delimiter,
-            "notexisting", args.delimiter,
-            "unique", args.delimiter,
-            "avg", args.delimiter,
-            "var", args.delimiter,
-            "std", args.delimiter,
-            "max", args.delimiter,
-            "min", args.delimiter,
-            "max-value", args.delimiter,
-            "min-value", args.delimiter,
-            "max-len", args.delimiter,
-            "min-len", args.delimiter,
-            "field name"))
     sortedstats = collections.OrderedDict(sorted(stats.items()))
-    for key, value in sortedstats.items():
-        if key in valstats:
-            unique = len(valstats[key])
-            data = []
-            for obj in valstats[key]:
-                data.append(valstats[key][obj])
-        if len(data) > 0:
-            npdata = np.asarray(data)
-        else:
-            npdata = np.asarray([0])
-        format_string = str(
-            "{:>8.0f}{:1s}{:>9d}{:1s}{:>6.2f}{:1s}{:>6.2f}{:1s}{:>14d}{:1s}{:>7d}{:1s}{:>10.2f}{:1s}{:>16.2f}{:1s}{:>10.2f}{:1s}{:>10d}{:1s}{:>9d}{:1s}" + "{:>" + args.len_val + "s}" + "{:1s}{:>" + args.len_val + "s}{:1s}{:>7s}{:1s}{:>7s}{:1s}{:<40s}")
-        print(format_string.format(
-            percentage_stats[key], args.delimiter,
-            value, args.delimiter,
-            getpercent(percentage_stats[key], hitcount), args.delimiter,
-            getpercent(getnotexisting(percentage_stats[key], hitcount), hitcount), args.delimiter,
-            getnotexisting(value, hitcount), args.delimiter,
-            unique, args.delimiter,
-            np.mean(npdata), args.delimiter,
-            np.var(npdata), args.delimiter,
-            np.std(npdata), args.delimiter,
-            max(data, default=0), args.delimiter,
-            min(data, default=0), args.delimiter,
-            '"' + str(max(valstats[key], key=lambda x: valstats[key][x], default=0)).strip()[
-                  0:int(args.len_val) - 2] + '"', args.delimiter,
-            '"' + str(min(valstats[key], key=lambda x: valstats[key][x], default=0)).strip()[
-                  0:int(args.len_val) - 2] + '"', args.delimiter,
-            str_max_map_len(valstats[key]), args.delimiter,
-            str_max_map_len(valstats[key]), args.delimiter,
-            '"' + key + '"'))
+    field_statistics = generate_field_statistics(sortedstats.items(), valstats, percentage_stats, hitcount, args.len_val)
+    simple_text_print(field_statistics, hitcount, args.headless, args.delimiter, args.len_val)
 
 
 if __name__ == "__main__":
