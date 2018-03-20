@@ -193,9 +193,10 @@ def run():
         description='return field statistics of an line-delimited JSON Document or Input-Stream')
     parser.add_argument('-marc', action="store_true", help='Ignore Marc Indicator')
     parser.add_argument('-help', action="store_true", help='print more help')
-    parser.add_argument('-headless', action="store_true", help='don\'t print head')
-    parser.add_argument('-len_val', type=str, default="17", help='don\'t print head')
-    parser.add_argument('-no_whitespace', default="|", type=str, help='don\'t count val with whitespacewhitespace')
+    parser.add_argument('-headless', action="store_true", help='don\'t print header')
+    parser.add_argument('-len_val', type=str, default="17",
+                        help='specify the length for the values of "max-value" and "min-value"')
+    parser.add_argument('-no_whitespace', default="|", type=str, help='don\'t count val with whitespace')
     parser.add_argument('-delimiter', default="|", type=str, help='delimiter to use')
     parser.add_argument('-csv-output', action="store_true",
                         help='prints the output as pure CSV data (all values are quoted)', dest='csv_output')

@@ -8,10 +8,14 @@ It reads from stdin and prints to stdout.
 
 ```
 jsonl-fstats.py 
-        -help      print this help
-        -marc      ignore Marc indicator field if you are analysing an index of marc records
-        -headless  don't print headline
-        -delimiter set which delimiter to use
+        -h, --help                      show this help message and exit
+        -marc                           Ignore Marc Indicator
+        -help                           print more help
+        -headless                       don't print header
+        -len_val LEN_VAL                specify the length for the values of "max-value" and "min-value"
+        -no_whitespace NO_WHITESPACE    don't count val with whitespace
+        -delimiter DELIMITER            delimiter to use
+        -csv-output                     prints the output as pure CSV data (all values are quoted)
 ```
 
 * example with input and output file:
@@ -31,8 +35,8 @@ apt-get install python3-numpy
 ## Run
 
 * install numpy
-* clone this git repo or just download the jsonl-fstats.py file
-* run ./jsonl-fstats.py
+* clone this git repo or just download the [jsonl_fstats.py](jsonl_fstats/jsonl_fstats.py) file
+* run ./jsonl_fstats.py
 * for a hackish way to use jsonl-fstats system-wide, copy to /usr/local/bin
 
 
